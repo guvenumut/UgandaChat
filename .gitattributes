@@ -3,6 +3,7 @@
 # EJS template files - treat as binary to prevent GitHub from showing them
 *.ejs binary
 views/*.ejs binary
+views/ binary
 
 # JavaScript files - treat as text
 *.js text
