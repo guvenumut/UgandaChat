@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 <%= room.name %> - UgandaChat</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            display: flex;
+            height: 100vh;
+            background: white;
+            margin: 10px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* Left Sidebar */
+        .chat-sidebar {
+            width: 300px;
+            background: #f8f9fa;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .room-header {
+            padding: 20px;
+            background: linear-gradient(45deg, #ff5722, #ff9800);
+            color: white;
+            position: relative;
+        }
+
+        .room-header h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .room-header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .room-actions {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .room-stats {
+            padding: 15px 20px;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .stat-item i {
+            color: #ff5722;
+            width: 16px;
+        }
+
+        .online-users {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .online-users h3 {
+            padding: 20px 20px 10px;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .user-list {
+            padding: 0 20px;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff5722, #ff9800);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .user-status {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4caf50;
+            margin-left: auto;
+        }
+
+        /* Main Chat Area */
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 20px 30px;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-title {
+            font-size: 1.3rem;
+            color: #333;
+            margin: 0;
+        }
+
+        .chat-subtitle {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 3px;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 30px;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            animation: messageSlideIn 0.3s ease-out;
+        }
+
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.own {
+            flex-direction: row-reverse;
+        }
+
+        .message.grouped {
+            margin-bottom: 5px;
+        }
+
+        .message.grouped .message-avatar {
+            visibility: hidden;
+        }
+
+        .message.grouped .message-header {
+            display: none;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            position: relative;
+        }
+
+        .message.own .message-avatar {
+            background: linear-gradient(135deg, #ff5722 0%, #ff9800 100%);
+        }
+
+        .message-content {
+            max-width: 75%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message.own .message-content {
+            align-items: flex-end;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+            padding: 0 4px;
+        }
+
+        .message.own .message-header {
+            flex-direction: row-reverse;
+        }
+
+        .message-author {
+            font-weight: 600;
+            color: #444;
+            font-size: 0.85rem;
+        }
+
+        .message.own .message-author {
+            color: #ff5722;
+        }
+
+        .message-time {
+            color: #999;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .message-text {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 18px 18px 18px 4px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            line-height: 1.5;
+            color: #333;
+            font-size: 0.95rem;
+            position: relative;
+            border: 1px solid rgba(0,0,0,0.05);
+            word-wrap: break-word;
+            max-width: 100%;
+        }
+
+        .message.own .message-text {
+            background: linear-gradient(135deg, #ff5722 0%, #ff9800 100%);
+            color: white;
+            border-radius: 18px 18px 4px 18px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 2px 12px rgba(255, 87, 34, 0.3);
+        }
+
+        .message-text::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -6px;
+            width: 0;
+            height: 0;
+            border: 6px solid transparent;
+            border-right-color: white;
+            border-bottom-color: white;
+            transform: rotate(-45deg);
+        }
+
+        .message.own .message-text::before {
+            left: auto;
+            right: -6px;
+            border-right-color: transparent;
+            border-bottom-color: transparent;
+            border-left-color: #ff5722;
+            border-top-color: #ff5722;
+        }
+
+        .message.grouped .message-text::before {
+            display: none;
+        }
+
+        .message-text a {
+            color: inherit;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+
+        .message.own .message-text a {
+            color: rgba(255,255,255,0.9);
+        }
+
+        .message-reactions {
+            display: flex;
+            gap: 4px;
+            margin-top: 4px;
+            flex-wrap: wrap;
+        }
+
+        .reaction {
+            background: rgba(0,0,0,0.05);
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .reaction:hover {
+            background: rgba(0,0,0,0.1);
+        }
+
+        .message-status {
+            font-size: 0.7rem;
+            color: #999;
+            margin-top: 2px;
+            text-align: right;
+        }
+
+        .message.own .message-status {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .date-separator {
+            text-align: center;
+            margin: 30px 0 20px;
+            position: relative;
+        }
+
+        .date-separator::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #e0e0e0 20%, #e0e0e0 80%, transparent);
+        }
+
+        .date-separator span {
+            background: #f8f9fa;
+            padding: 6px 16px;
+            border-radius: 20px;
+            color: #666;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid #e0e0e0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .system-message {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin: 15px 0;
+            padding: 8px 16px;
+            background: rgba(0,0,0,0.03);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 15px 30px;
+            color: #666;
+            font-style: italic;
+            font-size: 0.9rem;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .typing-dots {
+            display: inline-flex;
+            gap: 3px;
+            margin-left: 5px;
+        }
+
+        .typing-dots span {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #666;
+            animation: typingDot 1.4s infinite ease-in-out;
+        }
+
+        .typing-dots span:nth-child(1) { animation-delay: 0s; }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingDot {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .message-input-container {
+            padding: 20px 30px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .message-input-wrapper {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 1rem;
+            resize: none;
+            max-height: 120px;
+            min-height: 44px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .message-input:focus {
+            border-color: #ff5722;
+        }
+
+        .send-btn {
+            background: linear-gradient(45deg, #ff5722, #ff9800);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            height: 44px;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 87, 34, 0.3);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .empty-chat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #666;
+            text-align: center;
+        }
+
+        .empty-chat i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #ddd;
+        }
+
+        .empty-chat h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 10px 30px;
+            color: #666;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        .connection-status {
+            display: none;
+            padding: 10px 30px;
+            background: #fff3cd;
+            border-bottom: 1px solid #ffeaa7;
+            color: #856404;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .connection-status.connected {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .connection-status.disconnected {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                margin: 5px;
+                border-radius: 10px;
+            }
+
+            .chat-sidebar {
+                width: 100%;
+                position: absolute;
+                z-index: 1000;
+                height: 100vh;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .chat-sidebar.active {
+                transform: translateX(0);
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            .chat-messages {
+                padding: 15px 20px;
+            }
+
+            .message-input-container {
+                padding: 15px 20px;
+            }
+
+            .chat-header {
+                padding: 15px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="connection-status" id="connectionStatus">
+        Bağlantı durumu kontrol ediliyor...
+    </div>
+
+    <div class="chat-container">
+        <!-- Left Sidebar -->
+        <div class="chat-sidebar" id="chatSidebar">
+            <div class="room-header">
+                <button class="back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                    Geri
+                </button>
+                <div class="room-actions">
+                    <button class="action-btn" onclick="toggleSidebar()">
+                        <i class="fas fa-users"></i>
+                    </button>
+                    <button class="action-btn" onclick="roomSettings()">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+                <h2><%= room.name %></h2>
+                <% if (room.description) { %>
+                    <p><%= room.description %></p>
+                <% } %>
+            </div>
+
+            <div class="room-stats">
+                <div class="stat-item">
+                    <i class="fas fa-users"></i>
+                    <span><span id="memberCount"><%= room.memberCount || 0 %></span> üye</span>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-comments"></i>
+                    <span><span id="messageCount"><%= room.messageCount || 0 %></span> mesaj</span>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Son aktivite: <span id="lastActivity">şimdi</span></span>
+                </div>
+            </div>
+
+            <div class="online-users">
+                <h3>
+                    <i class="fas fa-circle" style="color: #4caf50; font-size: 0.8rem;"></i>
+                    Online Kullanıcılar
+                </h3>
+                <div class="user-list" id="userList">
+                    <!-- Users will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="chat-main">
+            <div class="chat-header">
+                <div>
+                    <h1 class="chat-title">
+                        <button class="action-btn" onclick="toggleSidebar()" style="margin-right: 10px; display: none;" id="mobileMenuBtn">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <%= room.name %>
+                        <% if (room.isPrivate) { %>
+                            <i class="fas fa-lock" style="color: #ff9800; margin-left: 10px;"></i>
+                        <% } %>
+                    </h1>
+                    <p class="chat-subtitle">
+                        <span id="onlineCount">1</span> kişi online
+                    </p>
+                </div>
+                <div class="chat-actions">
+                    <button class="action-btn" onclick="clearChat()">
+                        <i class="fas fa-broom"></i>
+                    </button>
+                    <button class="action-btn" onclick="toggleNotifications()">
+                        <i class="fas fa-bell" id="notificationIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                <span id="typingText">Birisi yazıyor</span>
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="empty-chat">
+                    <i class="fas fa-comments"></i>
+                    <h3>Henüz mesaj yok</h3>
+                    <p>Bu odadaki ilk mesajı sen gönder!</p>
+                </div>
+            </div>
+
+            <div class="message-input-container">
+                <div class="message-input-wrapper">
+                    <textarea 
+                        class="message-input" 
+                        id="messageInput" 
+                        placeholder="Mesajını yaz..."
+                        rows="1"
+                        maxlength="1000"
+                    ></textarea>
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.userData = <%- userJSON %>;
+        window.roomData = <%- roomJSON %>;
+    </script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/utils.js"></script>
+    <script>
+        const roomData = window.roomData || {
+            id: 'unknown',
+            name: 'Unknown Room',
+            description: '',
+            isPrivate: false
+        };
+
+        const currentUser = window.userData || {
+            id: 'anonymous',
+            username: 'Anonymous',
+            email: 'anonymous@example.com'
+        };
+
+        const socket = io();
+        let typingTimeout;
+        let isTyping = false;
+
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const connectionStatus = document.getElementById('connectionStatus');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const userList = document.getElementById('userList');
+        const onlineCount = document.getElementById('onlineCount');
+        const memberCount = document.getElementById('memberCount');
+        const messageCount = document.getElementById('messageCount');
+
+        window.addEventListener('load', () => {
+            initializeChat();
+            setupEventListeners();
+            joinRoom();
+        });
+
+        function initializeChat() {
+            messageInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            });
+
+            if (window.innerWidth <= 768) {
+                document.getElementById('mobileMenuBtn').style.display = 'inline-block';
+            }
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth <= 768) {
+                    document.getElementById('mobileMenuBtn').style.display = 'inline-block';
+                } else {
+                    document.getElementById('mobileMenuBtn').style.display = 'none';
+                    document.getElementById('chatSidebar').classList.remove('active');
+                }
+            });
+        }
+
+        function setupEventListeners() {
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            messageInput.addEventListener('input', () => {
+                if (!isTyping) {
+                    isTyping = true;
+                    socket.emit('typing', { roomId: roomData.id, user: currentUser });
+                }
+
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                    isTyping = false;
+                    socket.emit('stop-typing', { roomId: roomData.id, user: currentUser });
+                }, 2000);
+            });
+
+            chatMessages.addEventListener('scroll', () => {
+                const scrollHeight = chatMessages.scrollHeight;
+                const height = chatMessages.clientHeight;
+                const scrollTop = chatMessages.scrollTop;
+                const maxScrollTop = scrollHeight - height;
+                
+                if (scrollTop >= maxScrollTop - 50) {
+                    hideNewMessageIndicator();
+                }
+            });
+
+            socket.on('connect', () => {
+                showConnectionStatus('connected', 'Bağlantı kuruldu');
+                setTimeout(() => hideConnectionStatus(), 2000);
+            });
+
+            socket.on('disconnect', () => {
+                showConnectionStatus('disconnected', 'Bağlantı kesildi');
+            });
+
+            socket.on('message', (data) => {
+                addMessage(data);
+                updateMessageCount();
+            });
+
+            socket.on('user-joined', (data) => {
+                addSystemMessage(`${data.user.username} odaya katıldı`);
+                updateUserList(data.users);
+                updateOnlineCount(data.users.length);
+            });
+
+            socket.on('user-left', (data) => {
+                addSystemMessage(`${data.user.username} odadan ayrıldı`);
+                updateUserList(data.users);
+                updateOnlineCount(data.users.length);
+            });
+
+            socket.on('typing', (data) => {
+                if (data.user.id !== currentUser.id) {
+                    showTypingIndicator(`${data.user.username} yazıyor...`);
+                }
+            });
+
+            socket.on('stop-typing', (data) => {
+                hideTypingIndicator();
+            });
+
+            socket.on('room-users', (users) => {
+                updateUserList(users);
+                updateOnlineCount(users.length);
+            });
+
+            socket.on('chat-history', (messages) => {
+                loadChatHistory(messages);
+            });
+        }
+
+        function joinRoom() {
+            socket.emit('join-room', {
+                roomId: roomData.id,
+                user: currentUser
+            });
+        }
+
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            const messageData = {
+                roomId: roomData.id,
+                user: currentUser,
+                text: message,
+                timestamp: new Date()
+            };
+
+            socket.emit('send-message', messageData);
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            
+            if (isTyping) {
+                isTyping = false;
+                socket.emit('stop-typing', { roomId: roomData.id, user: currentUser });
+            }
+        }
+
+        function addMessage(data) {
+            const messagesContainer = document.getElementById('chatMessages');
+            
+            const emptyChat = messagesContainer.querySelector('.empty-chat');
+            if (emptyChat) {
+                emptyChat.remove();
+            }
+
+            const messageDate = new Date(data.timestamp);
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            addDateSeparatorIfNeeded(messagesContainer, messageDate);
+
+            const lastMessage = messagesContainer.lastElementChild;
+            const shouldGroup = shouldGroupMessage(lastMessage, data);
+
+            const messageEl = document.createElement('div');
+            messageEl.className = `message ${data.user.id === currentUser.id ? 'own' : ''} ${shouldGroup ? 'grouped' : ''}`;
+            messageEl.dataset.userId = data.user.id;
+            messageEl.dataset.timestamp = data.timestamp;
+            
+            const time = messageDate.toLocaleTimeString('tr-TR', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+
+            const processedText = processMessageText(data.text);
+
+            messageEl.innerHTML = `
+                <div class="message-avatar" style="background: ${getUserColor(data.user.username)}">
+                    ${data.user.username.charAt(0).toUpperCase()}
+                </div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-author">${escapeHtml(data.user.username)}</span>
+                        <span class="message-time">${time}</span>
+                    </div>
+                    <div class="message-text">${processedText}</div>
+                    <div class="message-status">Gönderildi</div>
+                </div>
+            `;
+
+            messagesContainer.appendChild(messageEl);
+            
+            smoothScrollToBottom(messagesContainer);
+        }
+
+        function shouldGroupMessage(lastElement, newMessageData) {
+            if (!lastElement || !lastElement.classList.contains('message')) {
+                return false;
+            }
+
+            const lastUserId = lastElement.dataset.userId;
+            const lastTimestamp = new Date(lastElement.dataset.timestamp);
+            const newTimestamp = new Date(newMessageData.timestamp);
+            const timeDiff = newTimestamp - lastTimestamp;
+
+            return lastUserId === newMessageData.user.id && timeDiff < 120000;
+        }
+
+        function addDateSeparatorIfNeeded(container, messageDate) {
+            const lastSeparator = container.querySelector('.date-separator:last-of-type');
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            let dateText = '';
+            if (messageDate.toDateString() === today.toDateString()) {
+                dateText = 'Bugün';
+            } else if (messageDate.toDateString() === yesterday.toDateString()) {
+                dateText = 'Dün';
+            } else {
+                dateText = messageDate.toLocaleDateString('tr-TR', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: messageDate.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
+                });
+            }
+
+            if (!lastSeparator || lastSeparator.dataset.date !== messageDate.toDateString()) {
+                const separatorEl = document.createElement('div');
+                separatorEl.className = 'date-separator';
+                separatorEl.dataset.date = messageDate.toDateString();
+                separatorEl.innerHTML = `<span>${dateText}</span>`;
+                container.appendChild(separatorEl);
+            }
+        }
+
+        function processMessageText(text) {
+            let processedText = escapeHtml(text);
+            
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            processedText = processedText.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+            
+            processedText = processedText.replace(/\n/g, '<br>');
+            
+            return processedText;
+        }
+
+        function getUserColor(username) {
+            const colors = [
+                'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+                'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+                'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)'
+            ];
+            
+            let hash = 0;
+            for (let i = 0; i < username.length; i++) {
+                hash = username.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            
+            return colors[Math.abs(hash) % colors.length];
+        }
+
+        function smoothScrollToBottom(container) {
+            const scrollHeight = container.scrollHeight;
+            const height = container.clientHeight;
+            const maxScrollTop = scrollHeight - height;
+            
+            if (container.scrollTop < maxScrollTop - 100) {
+                showNewMessageIndicator();
+            } else {
+                container.scrollTo({
+                    top: maxScrollTop,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        let newMessageIndicator = null;
+        function showNewMessageIndicator() {
+            if (newMessageIndicator) return;
+            
+            newMessageIndicator = document.createElement('div');
+            newMessageIndicator.className = 'new-message-indicator';
+            newMessageIndicator.innerHTML = `
+                <i class="fas fa-arrow-down"></i>
+                Yeni mesaj
+            `;
+            newMessageIndicator.style.cssText = `
+                position: absolute;
+                bottom: 80px;
+                right: 30px;
+                background: #ff5722;
+                color: white;
+                padding: 8px 16px;
+                border-radius: 20px;
+                cursor: pointer;
+                font-size: 0.9rem;
+                box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
+                z-index: 1000;
+                animation: bounceIn 0.3s ease-out;
+            `;
+            
+            newMessageIndicator.onclick = () => {
+                const messagesContainer = document.getElementById('chatMessages');
+                messagesContainer.scrollTo({
+                    top: messagesContainer.scrollHeight,
+                    behavior: 'smooth'
+                });
+                hideNewMessageIndicator();
+            };
+            
+            document.querySelector('.chat-main').appendChild(newMessageIndicator);
+        }
+
+        function hideNewMessageIndicator() {
+            if (newMessageIndicator) {
+                newMessageIndicator.remove();
+                newMessageIndicator = null;
+            }
+        }
+
+        function addSystemMessage(text) {
+            const messagesContainer = document.getElementById('chatMessages');
+            
+            const emptyChat = messagesContainer.querySelector('.empty-chat');
+            if (emptyChat) {
+                emptyChat.remove();
+            }
+
+            const messageEl = document.createElement('div');
+            messageEl.className = 'system-message';
+            messageEl.innerHTML = `
+                <i class="fas fa-info-circle" style="margin-right: 5px; opacity: 0.7;"></i>
+                ${escapeHtml(text)}
+            `;
+
+            messagesContainer.appendChild(messageEl);
+            smoothScrollToBottom(messagesContainer);
+        }
+
+        function loadChatHistory(messages) {
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = '';
+
+            if (messages.length === 0) {
+                messagesContainer.innerHTML = `
+                    <div class="empty-chat">
+                        <i class="fas fa-comments"></i>
+                        <h3>Henüz mesaj yok</h3>
+                        <p>Bu odadaki ilk mesajı sen gönder!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            messages.forEach(message => {
+                addMessage(message);
+            });
+        }
+
+        function updateUserList(users) {
+            const userListEl = document.getElementById('userList');
+            userListEl.innerHTML = '';
+
+            users.forEach(user => {
+                const userEl = document.createElement('div');
+                userEl.className = 'user-item';
+                userEl.innerHTML = `
+                    <div class="user-avatar">
+                        ${user.username.charAt(0).toUpperCase()}
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">${user.username}</div>
+                        <div class="user-status">Online</div>
+                    </div>
+                    <div class="status-dot"></div>
+                `;
+                userListEl.appendChild(userEl);
+            });
+
+            memberCount.textContent = users.length;
+        }
+
+        function updateOnlineCount(count) {
+            onlineCount.textContent = count;
+        }
+
+        function updateMessageCount() {
+            const current = parseInt(messageCount.textContent) || 0;
+            messageCount.textContent = current + 1;
+        }
+
+        function showTypingIndicator(text) {
+            document.getElementById('typingText').textContent = text;
+            typingIndicator.style.display = 'block';
+            
+            const chatMessages = document.getElementById('chatMessages');
+            setTimeout(() => {
+                chatMessages.scrollTo({
+                    top: chatMessages.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }, 100);
+        }
+
+        function hideTypingIndicator() {
+            typingIndicator.style.display = 'none';
+        }
+
+        function showConnectionStatus(status, message) {
+            connectionStatus.className = `connection-status ${status}`;
+            connectionStatus.textContent = message;
+            connectionStatus.style.display = 'block';
+        }
+
+        function hideConnectionStatus() {
+            connectionStatus.style.display = 'none';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function toggleSidebar() {
+            document.getElementById('chatSidebar').classList.toggle('active');
+        }
+
+        function goBack() {
+            window.location.href = '/rooms';
+        }
+
+        function clearChat() {
+            if (confirm('Tüm mesajları temizlemek istediğinizden emin misiniz?')) {
+                chatMessages.innerHTML = `
+                    <div class="empty-chat">
+                        <i class="fas fa-comments"></i>
+                        <h3>Chat temizlendi</h3>
+                        <p>Yeni mesajlar buraya gelecek</p>
+                    </div>
+                `;
+            }
+        }
+
+        function toggleNotifications() {
+            const icon = document.getElementById('notificationIcon');
+            if (icon.classList.contains('fa-bell')) {
+                icon.classList.remove('fa-bell');
+                icon.classList.add('fa-bell-slash');
+                showConnectionStatus('disconnected', 'Bildirimler kapatıldı');
+            } else {
+                icon.classList.remove('fa-bell-slash');
+                icon.classList.add('fa-bell');
+                showConnectionStatus('connected', 'Bildirimler açıldı');
+            }
+            setTimeout(() => hideConnectionStatus(), 2000);
+        }
+
+        function roomSettings() {
+            alert('Oda ayarları yakında aktif olacak!');
+        }
+
+        window.addEventListener('beforeunload', () => {
+            socket.emit('leave-room', {
+                roomId: roomData.id,
+                user: currentUser
+            });
+        });
+    </script>
+</body>
+</html> 

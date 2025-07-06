@@ -1,0 +1,37 @@
+# UgandaChat Git Attributes
+
+# EJS template files - treat as binary to prevent GitHub from showing them
+*.ejs binary
+views/*.ejs binary
+
+# JavaScript files - treat as text
+*.js text
+*.mjs text
+
+# JSON files - treat as text
+*.json text
+
+# CSS files - treat as text
+*.css text
+
+# HTML files - treat as text
+*.html text
+
+# Markdown files - treat as text
+*.md text
+
+# Configuration files - treat as text
+*.env.example text
+*.gitignore text
+*.gitattributes text
+
+# Firebase config - treat as text
+serviceAccountKey.json.example text
+
+# Package files - treat as text
+package.json text
+package-lock.json text
+
+# Documentation - treat as text
+SETUP.md text
+README.md text

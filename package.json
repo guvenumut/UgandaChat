@@ -1,0 +1,36 @@
+{
+  "name": "uganda-chat-app",
+  "version": "1.0.0",
+  "description": "UgandaChat - Node.js + Express.js ile gerçek zamanlı chat uygulaması",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "dev:prod": "NODE_ENV=production nodemon app.js",
+    "prod": "NODE_ENV=production node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "firebase",
+    "chat",
+    "realtime",
+    "socket.io",
+    "node.js"
+  ],
+  "author": "Kanya <umutgk61@gmail.com>",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.0.1",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "firebase": "^11.10.0",
+    "firebase-admin": "^13.4.0",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
