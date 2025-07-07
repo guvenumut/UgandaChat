@@ -11,6 +11,7 @@ const logoutRoutes = require('./routes/logout');
 const { db, admin } = require('./config/firebase-config');
 const dotenv = require('dotenv');
 dotenv.config();
+const {blockAuth,isAuth} = require('./middleware/auth');
 
 const port = process.env.PORT || 3000;
 
@@ -40,18 +41,31 @@ app.use(session({
     }
 }));
 
-app.use(express.static('public'));
 
 app.use('/register', registerRoutes);
 app.use('/login', loginRoutes);
 app.use('/rooms', roomsRoutes);
 app.use('/logout', logoutRoutes);
 
-app.get('/', (req, res) => {
+
+
+app.get('/',blockAuth, (req, res) => {
     res.render('index', { 
         title: 'UgandaChat - Ana Sayfa' 
     });
 });
+
+app.use(express.static('public'));
+app.use((req, res, next) => {
+    console.log(`404 - Path not found: ${req.originalUrl}`);
+    
+    if (req.session && req.session.user) {
+        return res.redirect('/rooms');
+    } else {
+        return res.redirect('/login');
+    }
+});
+
 
 const activeRooms = new Map();
 const userSockets = new Map();

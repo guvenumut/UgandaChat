@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { db } = require('../config/firebase-config');
-const isAuth = require('../middleware/auth');
+const { isAuth } = require('../middleware/auth');
 router.get('/', isAuth, async (req, res) => {
     try {
         const roomsSnapshot = await db.collection('rooms').orderBy('createdAt', 'desc').get();

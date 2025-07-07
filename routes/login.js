@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../config/firebase-config');
 const session = require('express-session');
-const isAuth = require('../middleware/auth');
 router.get('/', (req, res) => {
     res.render('login', { 
         title: 'Giriş Yap - UgandaChat',
