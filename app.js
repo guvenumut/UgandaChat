@@ -12,6 +12,7 @@ const { db, admin } = require('./config/firebase-config');
 const dotenv = require('dotenv');
 dotenv.config();
 const {blockAuth,isAuth} = require('./middleware/auth');
+const oauthRoutes = require('./routes/oauth');
 
 const port = process.env.PORT || 3000;
 
@@ -46,6 +47,7 @@ app.use('/register', registerRoutes);
 app.use('/login', loginRoutes);
 app.use('/rooms', roomsRoutes);
 app.use('/logout', logoutRoutes);
+app.use('/', oauthRoutes);
 
 
 

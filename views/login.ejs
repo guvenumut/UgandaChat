@@ -275,9 +275,7 @@
             color: #db4437;
         }
 
-        .social-btn.facebook {
-            color: #4267b2;
-        }
+
 
         @media (max-width: 480px) {
             .login-card {
@@ -356,14 +354,11 @@
             </div>
 
             <div class="social-login">
-                <a href="#" class="social-btn google">
+                <a href="/auth/google" class="social-btn google">
                     <i class="fab fa-google"></i>
                     Google ile devam et
                 </a>
-                <a href="#" class="social-btn facebook">
-                    <i class="fab fa-facebook-f"></i>
-                    Facebook ile devam et
-                </a>
+
             </div>
 
             <div class="register-link">
@@ -501,12 +496,7 @@
             }
         });
 
-        document.querySelectorAll('.social-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                showAlert('Sosyal medya girişi yakında aktif olacak!', 'info');
-            });
-        });
+
 
         document.querySelector('.forgot-password').addEventListener('click', (e) => {
             e.preventDefault();
