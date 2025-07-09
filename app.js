@@ -31,6 +31,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
+
 app.use(session({
     secret: process.env.SESSION_SECRET ,
     resave: false,
@@ -48,7 +50,7 @@ app.use('/login', loginRoutes);
 app.use('/rooms', roomsRoutes);
 app.use('/logout', logoutRoutes);
 app.use('/', oauthRoutes);
-
+app.use(express.static('public'));
 
 
 app.get('/',blockAuth, (req, res) => {
@@ -56,8 +58,8 @@ app.get('/',blockAuth, (req, res) => {
         title: 'UgandaChat - Ana Sayfa' 
     });
 });
-
 app.use(express.static('public'));
+
 app.use((req, res, next) => {
     console.log(`404 - Path not found: ${req.originalUrl}`);
     

@@ -238,6 +238,38 @@
             border: 1px solid #c8e6c9;
         }
 
+        .social-login {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .social-btn {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            color: #333;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .social-btn:hover {
+            border-color: #ff5722;
+            background: #fff5f5;
+        }
+
+        .social-btn.google {
+            color: #db4437;
+        }
+
         @media (max-width: 480px) {
             .register-card {
                 padding: 30px 20px;
@@ -316,6 +348,13 @@
             <div class="loading" id="loading">
                 <div class="spinner"></div>
                 <p>Kayıt oluşturuluyor...</p>
+            </div>
+
+            <div class="social-login">
+                <a href="/auth/google" class="social-btn google">
+                    <i class="fab fa-google"></i>
+                    Google ile devam et
+                </a>
             </div>
 
             <div class="login-link">
