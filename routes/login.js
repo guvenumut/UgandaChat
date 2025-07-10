@@ -26,7 +26,8 @@ router.post('/', async (req, res) => {
         }
         const userDoc = user.docs[0];
         const userData = userDoc.data();
-        const isPasswordValid = await bcrypt.compare(password, userData.hashedPassword);
+        const isPasswordValid = await bcrypt.compare(password, userData.password);
+        
         if (!isPasswordValid) {
             return res.status(401).json({ 
                 error: 'Email veya şifre hatalı!' 
