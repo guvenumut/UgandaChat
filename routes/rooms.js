@@ -5,7 +5,6 @@ const { isAuth } = require('../middleware/auth');
 router.get('/', isAuth, async (req, res) => {
     try {
         const roomsSnapshot = await db.collection('rooms').orderBy('createdAt', 'desc').get();
-        console.log(roomsSnapshot.docs.map(doc=> doc.data()));
         const rooms = [];
         roomsSnapshot.forEach(doc => {
             rooms.push({
@@ -85,7 +84,7 @@ router.get('/:id', isAuth, async (req, res) => {
             });
         }
         const roomData = { id: roomDoc.id, ...roomDoc.data() };
-        console.log(roomData.messages + "messages");
+        
         res.render('chat', { 
             title: `${roomData.name} - UgandaChat`,
             room: roomData,

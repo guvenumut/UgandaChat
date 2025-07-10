@@ -197,7 +197,7 @@ function handleUserLeave(socket, roomId, user) {
     console.log(`👤 ${user.username} left room ${roomId}`);
 }
 
-async function getChatHistory(roomId, limit = process.env.MAX_CHAT_HISTORY || 50) {
+async function getChatHistory(roomId, limit = parseInt(process.env.MAX_CHAT_HISTORY) || 50) {
     try {
         const snapshot = await db.collection('messages')
             .where('roomId', '==', roomId)

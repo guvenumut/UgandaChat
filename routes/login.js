@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../config/firebase-config');
 const session = require('express-session');
+const bcrypt = require('bcrypt');
 router.get('/', (req, res) => {
     res.render('login', { 
         title: 'Giriş Yap - UgandaChat',
@@ -17,20 +18,25 @@ router.post('/', async (req, res) => {
                 error: 'Email ve şifre gerekli!' 
             });
         }
-        const usersRef = db.collection('users');
-        const snapshot = await usersRef.where('email', '==', email).get();
-        if (snapshot.empty) {
+        const user = await db.collection('users').where('email', '==', email).get();
+        if (user.empty) {
             return res.status(401).json({ 
                 error: 'Email veya şifre hatalı!' 
             });
         }
-        const userDoc = snapshot.docs[0];
+        const userDoc = user.docs[0];
         const userData = userDoc.data();
-        if (userData.password !== password) {
+        const isPasswordValid = await bcrypt.compare(password, userData.hashedPassword);
+        if (!isPasswordValid) {
             return res.status(401).json({ 
                 error: 'Email veya şifre hatalı!' 
             });
         }
+        
+
+
+        
+        
         await db.collection('users').doc(userDoc.id).update({
             isOnline: true,
             lastSeen: new Date()

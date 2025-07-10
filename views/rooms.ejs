@@ -75,6 +75,14 @@
             justify-content: center;
             color: white;
             font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .username {
+            color: #333;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-right: 10px;
         }
 
         .logout-btn {
@@ -438,8 +446,9 @@
             </a>
             <div class="user-info">
                 <div class="user-avatar">
-                    <i class="fas fa-user"></i>
+                    <%= user.username.charAt(0).toUpperCase() %>
                 </div>
+                <span class="username"><%= user.username %></span>
                 <a href="/logout" class="logout-btn">
                     <i class="fas fa-sign-out-alt"></i>
                     Çıkış

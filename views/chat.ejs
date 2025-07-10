@@ -202,21 +202,38 @@
 
         .chat-actions {
             display: flex;
+            align-items: center;
             gap: 10px;
+        }
+
+        .user-info-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 20px;
+            margin-right: 10px;
+        }
+
+        .username-display {
+            color: #333;
+            font-weight: 600;
+            font-size: 0.9rem;
         }
 
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 20px 30px;
+            padding: 15px 20px;
             background: #f8f9fa;
         }
 
         .message {
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             display: flex;
             align-items: flex-end;
-            gap: 8px;
+            gap: 6px;
             animation: messageSlideIn 0.3s ease-out;
         }
 
@@ -236,7 +253,7 @@
         }
 
         .message.grouped {
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
 
         .message.grouped .message-avatar {
@@ -248,8 +265,8 @@
         }
 
         .message-avatar {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
@@ -257,15 +274,16 @@
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             flex-shrink: 0;
             border: 2px solid white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
             position: relative;
         }
 
         .message.own .message-avatar {
             background: linear-gradient(135deg, #ff5722 0%, #ff9800 100%);
+            
         }
 
         .message-content {
@@ -281,9 +299,9 @@
         .message-header {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 4px;
-            padding: 0 4px;
+            gap: 6px;
+            margin-bottom: 2px;
+            padding: 0 2px;
         }
 
         .message.own .message-header {
@@ -308,12 +326,12 @@
 
         .message-text {
             background: white;
-            padding: 12px 16px;
-            border-radius: 18px 18px 18px 4px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-            line-height: 1.5;
+            padding: 8px 12px;
+            border-radius: 16px 16px 16px 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            line-height: 1.4;
             color: #333;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             position: relative;
             border: 1px solid rgba(0,0,0,0.05);
             word-wrap: break-word;
@@ -323,9 +341,9 @@
         .message.own .message-text {
             background: linear-gradient(135deg, #ff5722 0%, #ff9800 100%);
             color: white;
-            border-radius: 18px 18px 4px 18px;
+            border-radius: 16px 16px 4px 16px;
             border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 2px 12px rgba(255, 87, 34, 0.3);
+            box-shadow: 0 2px 8px rgba(255, 87, 34, 0.25);
         }
 
         .message-text::before {
@@ -686,6 +704,9 @@
                     </p>
                 </div>
                 <div class="chat-actions">
+                    <div class="user-info-header">
+                        <span class="username-display" id="usernameDisplay"></span>
+                    </div>
                     <button class="action-btn" onclick="clearChat()">
                         <i class="fas fa-broom"></i>
                     </button>
@@ -770,6 +791,9 @@
         });
 
         function initializeChat() {
+            // Username'i header'da göster
+            document.getElementById('usernameDisplay').textContent = currentUser.username;
+            
             messageInput.addEventListener('input', function() {
                 this.style.height = 'auto';
                 this.style.height = Math.min(this.scrollHeight, 120) + 'px';

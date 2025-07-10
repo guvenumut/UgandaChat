@@ -329,7 +329,7 @@
                     <div class="input-wrapper">
                         <i class="fas fa-lock"></i>
                         <input type="password" id="password" name="password" required 
-                               placeholder="En az 6 karakter">
+                               placeholder="En az 8 karakter">
                     </div>
                     <div class="password-strength">
                         <div class="password-strength-bar" id="passwordStrengthBar"></div>
@@ -364,6 +364,152 @@
     </div>
 
     <script src="/js/utils.js"></script>
+    <script>
+        const form = document.getElementById('registerForm');
+        const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const registerBtn = document.getElementById('registerBtn');
+        const alert = document.getElementById('alert');
+
+        function showAlert(message, type) {
+            alert.textContent = message;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        function showFieldError(input, errorEl, message) {
+            input.classList.add('error');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+
+        function hideFieldError(input, errorEl) {
+            input.classList.remove('error');
+            errorEl.style.display = 'none';
+        }
+
+        function validateUsername() {
+            const username = usernameInput.value.trim();
+            const errorEl = document.getElementById('usernameError');
+            
+            if (!username) {
+                showFieldError(usernameInput, errorEl, 'Kullanıcı adı gerekli!');
+                return false;
+            }
+            
+            if (username.length < 3) {
+                showFieldError(usernameInput, errorEl, 'Kullanıcı adı en az 3 karakter olmalı!');
+                return false;
+            }
+            
+            if (username.length > 20) {
+                showFieldError(usernameInput, errorEl, 'Kullanıcı adı en fazla 20 karakter olabilir!');
+                return false;
+            }
+            
+            if (!/^[a-zA-Z0-9]+$/.test(username)) {
+                showFieldError(usernameInput, errorEl, 'Kullanıcı adı sadece harf ve rakam içerebilir!');
+                return false;
+            }
+            
+            hideFieldError(usernameInput, errorEl);
+            return true;
+        }
+
+        function validateEmail() {
+            const email = emailInput.value.trim();
+            const errorEl = document.getElementById('emailError');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (!email) {
+                showFieldError(emailInput, errorEl, 'Email gerekli!');
+                return false;
+            }
+            
+            if (!emailRegex.test(email)) {
+                showFieldError(emailInput, errorEl, 'Geçerli bir email adresi girin!');
+                return false;
+            }
+            
+            hideFieldError(emailInput, errorEl);
+            return true;
+        }
+
+        function validatePassword() {
+            const password = passwordInput.value;
+            const errorEl = document.getElementById('passwordError');
+            
+            if (!password) {
+                showFieldError(passwordInput, errorEl, 'Şifre gerekli!');
+                return false;
+            }
+            
+            if (password.length < 8) {
+                showFieldError(passwordInput, errorEl, 'Şifre en az 8 karakter olmalı!');
+                return false;
+            }
+            
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            
+            const strengthBar = document.getElementById('passwordStrengthBar');
+            const colors = ['#f44336', '#ff9800', '#ffeb3b', '#8bc34a', '#4caf50'];
+            const widths = ['20%', '40%', '60%', '80%', '100%'];
+            
+            if (strength > 0) {
+                strengthBar.style.width = widths[strength - 1];
+                strengthBar.style.backgroundColor = colors[strength - 1];
+            }
+            
+            hideFieldError(passwordInput, errorEl);
+            return true;
+        }
+
+        usernameInput.addEventListener('input', validateUsername);
+        emailInput.addEventListener('input', validateEmail);
+        passwordInput.addEventListener('input', validatePassword);
+
+        form.addEventListener('submit', (e) => {
+            const isUsernameValid = validateUsername();
+            const isEmailValid = validateEmail();
+            const isPasswordValid = validatePassword();
+            
+            if (!isUsernameValid || !isEmailValid || !isPasswordValid) {
+                e.preventDefault();
+                showAlert('Lütfen tüm alanları doğru şekilde doldurun!', 'error');
+                return false;
+            }
+            
+            showAlert('Kayıt işlemi başlatılıyor...', 'success');
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Kayıt Olunuyor...';
+        });
+
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const error = urlParams.get('error');
+            
+            if (error) {
+                const errorMessages = {
+                    'email_exists': 'Bu email adresi zaten kullanılıyor!',
+                    'username_exists': 'Bu kullanıcı adı zaten kullanılıyor!',
+                    'invalid_data': 'Geçersiz veri girişi!',
+                    'server_error': 'Sunucu hatası oluştu!'
+                };
+                
+                showAlert(errorMessages[error] || 'Kayıt sırasında hata oluştu!', 'error');
+            }
+        });
+    </script>
     
 </body>
 </html> 
