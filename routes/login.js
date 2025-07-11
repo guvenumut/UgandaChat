@@ -11,6 +11,7 @@ router.get('/', (req, res) => {
 });
 router.post('/', async (req, res) => {
     try {
+        
         const { email, password } = req.body;
         console.log('Login attempt:', email);
         if (!email || !password) {
@@ -18,6 +19,7 @@ router.post('/', async (req, res) => {
                 error: 'Email ve şifre gerekli!' 
             });
         }
+        
         const user = await db.collection('users').where('email', '==', email).get();
         if (user.empty) {
             return res.status(401).json({ 
@@ -26,6 +28,19 @@ router.post('/', async (req, res) => {
         }
         const userDoc = user.docs[0];
         const userData = userDoc.data();
+        
+        if (userData.authProvider && userData.authProvider === 'google') {
+            return res.status(401).json({ 
+                error: 'Bu hesap Google ile oluşturulmuş. Lütfen "Google ile devam et" butonunu kullanın.' 
+            });
+        }
+        
+        if (!userData.password) {
+            return res.status(401).json({ 
+                error: 'Email veya şifre hatalı!' 
+            });
+        }
+        
         const isPasswordValid = await bcrypt.compare(password, userData.password);
         
         if (!isPasswordValid) {
@@ -33,9 +48,6 @@ router.post('/', async (req, res) => {
                 error: 'Email veya şifre hatalı!' 
             });
         }
-        
-
-
         
         
         await db.collection('users').doc(userDoc.id).update({
