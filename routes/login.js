@@ -15,37 +15,42 @@ router.post('/', async (req, res) => {
         const { email, password } = req.body;
         console.log('Login attempt:', email);
         if (!email || !password) {
-            return res.status(400).json({ 
-                error: 'Email ve şifre gerekli!' 
+            return res.render('login', { 
+                title: 'Giriş Yap - UgandaChat',
+                message: 'Email ve şifre gerekli!' 
             });
         }
         
         const user = await db.collection('users').where('email', '==', email).get();
         if (user.empty) {
-            return res.status(401).json({ 
-                error: 'Email veya şifre hatalı!' 
+            return res.render('login', { 
+                title: 'Giriş Yap - UgandaChat',
+                message: 'Email veya şifre hatalı!' 
             });
         }
         const userDoc = user.docs[0];
         const userData = userDoc.data();
         
         if (userData.authProvider && userData.authProvider === 'google') {
-            return res.status(401).json({ 
-                error: 'Bu hesap Google ile oluşturulmuş. Lütfen "Google ile devam et" butonunu kullanın.' 
+            return res.render('login', { 
+                title: 'Giriş Yap - UgandaChat',
+                message: 'Bu hesap Google ile oluşturulmuş. Lütfen "Google ile devam et" butonunu kullanın.' 
             });
         }
         
         if (!userData.password) {
-            return res.status(401).json({ 
-                error: 'Email veya şifre hatalı!' 
+            return res.render('login', { 
+                title: 'Giriş Yap - UgandaChat',
+                message: 'Email veya şifre hatalı!' 
             });
         }
         
         const isPasswordValid = await bcrypt.compare(password, userData.password);
         
         if (!isPasswordValid) {
-            return res.status(401).json({ 
-                error: 'Email veya şifre hatalı!' 
+            return res.render('login', { 
+                title: 'Giriş Yap - UgandaChat',
+                message: 'Email veya şifre hatalı!' 
             });
         }
         
@@ -63,8 +68,9 @@ router.post('/', async (req, res) => {
         res.redirect('/rooms');
     } catch (error) {
         console.error('Login error:', error);
-        res.status(500).json({ 
-            error: 'Giriş sırasında hata oluştu!' 
+        res.render('login', { 
+            title: 'Giriş Yap - UgandaChat',
+            message: 'Giriş sırasında hata oluştu!' 
         });
     }
 });

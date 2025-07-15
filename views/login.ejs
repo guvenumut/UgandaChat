@@ -306,6 +306,12 @@
             </div>
 
             <div id="alert" class="alert"></div>
+            
+            <% if (message) { %>
+                <div class="alert alert-error" style="display: block;">
+                    <%= message %>
+                </div>
+            <% } %>
 
             <form id="loginForm" action="/login" method="post">
                 <div class="form-group">
@@ -436,13 +442,12 @@
             }
         });
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
+        form.addEventListener('submit', (e) => {
             const email = emailInput.value.trim();
             const password = passwordInput.value;
             
             if (!email || !password) {
+                e.preventDefault();
                 showAlert('Email ve şifre gerekli!', 'error');
                 return;
             }
@@ -451,49 +456,20 @@
             const isPasswordValid = validatePassword();
             
             if (!isEmailValid || !isPasswordValid) {
+                e.preventDefault();
                 showAlert('Lütfen geçerli bilgiler girin', 'error');
                 return;
+            }
+            
+            if (rememberMe.checked) {
+                localStorage.setItem('rememberedEmail', email);
+            } else {
+                localStorage.removeItem('rememberedEmail');
             }
             
             form.style.display = 'none';
             loading.style.display = 'block';
             
-            try {
-                const response = await fetch('/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password })
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok) {
-                    localStorage.setItem('user', JSON.stringify(result.user));
-                    
-                    if (rememberMe.checked) {
-                        localStorage.setItem('rememberedEmail', email);
-                    } else {
-                        localStorage.removeItem('rememberedEmail');
-                    }
-                    
-                    showAlert('Giriş başarılı! Chat sayfasına yönlendiriliyorsunuz...', 'success');
-                    
-                    setTimeout(() => {
-                        window.location.href = '/rooms';
-                    }, 1500);
-                } else {
-                    throw new Error(result.error || 'Giriş sırasında hata oluştu');
-                }
-                
-            } catch (error) {
-                console.error('Login error:', error);
-                showAlert(error.message || 'Giriş sırasında hata oluştu', 'error');
-                
-                loading.style.display = 'none';
-                form.style.display = 'block';
-            }
         });
 
 
